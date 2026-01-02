@@ -44,10 +44,11 @@ $(document).ready(function() {
 		updateMarkdownPreview: function(html, isAfterUserInput) {
 			editor.markdownPreview.html(html);
 			editor.updateWordCount(editor.markdownPreview.text());
-			
+
 			preview.onImagesLoad(function() {
 				editor.triggerEditorUpdatedEvent(isAfterUserInput);
 			});
+			editor.useKaTeX();
 		},
 
 		scrollMarkdownPreviewCaretIntoView: (function() {
@@ -78,8 +79,7 @@ $(document).ready(function() {
 		useTheme: function(stylesheet) {
 			editor.themeSelector.setAttribute("href", stylesheet);
 		}
-
-	};
+	}
 
 	app.init();
 

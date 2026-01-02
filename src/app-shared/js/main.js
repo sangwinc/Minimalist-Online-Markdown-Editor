@@ -150,11 +150,18 @@ $document.ready(function() {
 		// Convert Markdown to HTML and update active panel
 		convertMarkdown: function(isAfterUserInput) {
 			var html;
+			var protectedlatex;
 
 			if (this.activePanel != "preview" && this.activePanel != "html") return;
 
 			if (this.activePanel == "preview") {
-				html = this.previewMarkdownConverter.render(this.markdown);
+				// Pre-process with optional blocks. (Is this the right place?!)
+				// (1) Protect the latex backslashes before we render markdown.
+				protectedlatex = this.markdown;
+				protectedlatex = protectedlatex.replace(/\\([()\[\]])/g, '\\\\$1');
+				// (2) Process AsciiMath.
+
+				html = this.previewMarkdownConverter.render(protectedlatex);
 				app.updateMarkdownPreview(html, isAfterUserInput);
 
 				this.triggerEditorUpdatedEvent(isAfterUserInput);
@@ -310,6 +317,22 @@ $document.ready(function() {
 					break;
 			}
 			featureTrigger.toggleClass("active");
+		},
+
+		// From https://katex.org/docs/autorender
+		useKaTeX: function() {
+			renderMathInElement(document.body, {
+				// customised options
+				// • auto-render specific keys, e.g.:
+				delimiters: [
+					{left: '$$', right: '$$', display: true},
+					{left: '$', right: '$', display: false},
+					{left: '\\(', right: '\\)', display: false},
+					{left: '\\[', right: '\\]', display: true}
+				],
+				// Rendering keys, e.g.:
+				throwOnError : false
+				});
 		},
 
 		toggleSyncScroll: (function() {

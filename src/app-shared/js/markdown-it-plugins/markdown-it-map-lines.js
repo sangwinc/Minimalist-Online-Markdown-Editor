@@ -30,13 +30,14 @@ window.markdownitMapLines = function(mdit) {
 	};
 
 	mdit.renderer.rules.code_block = function(tokens, idx) {
+		var code = tokens[idx].content;
 		if (tokens[idx].lines) {
 			return 	"<pre id=\"line-start-"+ tokens[idx].lines[0] +"\" data-line-end=\""+ tokens[idx].lines[1] +"\">"+
-						"<code>"+ escapeHtml(tokens[idx].content) +"</code>"+
+						"<code>"+ escapeHtml(code) +"</code>"+
 					"</pre>\n";
 		}
 
-		return "<pre><code>"+ escapeHtml(tokens[idx].content) +"</code></pre>\n";
+		return "HELLO!<pre><code>"+ escapeHtml(code) +"</code></pre>\n";
 	};
 
 	mdit.renderer.rules.fence = mdit.renderer.rules.code_block;

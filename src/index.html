@@ -24,8 +24,46 @@
 		<script src="app-shared/js/main.js"></script>
 		<script src="js/main.js"></script>
 		<!-- endbuild -->
+		<!-- KaTeX -->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.css" integrity="sha384-Pu5+C18nP5dwykLJOhd2U4Xen7rjScHN/qusop27hdd2drI+lL5KvX7YntvT8yew" crossorigin="anonymous">
+		<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.js" integrity="sha384-2B8pfmZZ6JlVoScJm/5hQfNS2TI/6hPqDZInzzPc8oHpN5SgeNOf4LzREO6p5YtZ" crossorigin="anonymous"></script>
+		<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"></script>
+		<script>
+			document.addEventListener("DOMContentLoaded", function() {
+				renderMathInElement(document.body, {
+				// customised options
+				// • auto-render specific keys, e.g.:
+				delimiters: [
+					{left: '$$', right: '$$', display: true},
+					{left: '$', right: '$', display: false},
+					{left: '\\(', right: '\\)', display: false},
+					{left: '\\[', right: '\\]', display: true}
+				],
+				// Rendering keys, e.g.:
+				throwOnError : false
+				});
+			});
+		</script>
+		<script>
+			window.katexRenderOptions = {
+				delimiters: [
+					{ left: "$$", right: "$$", display: true },
+					{ left: "\\[", right: "\\]", display: true },
+					{ left: "$", right: "$", display: false },
+					{ left: "\\(", right: "\\)", display: false }
+				],
+				throwOnError: false,
+				errorColor: "#cc0000",
+				ignoredTags: [
+					"script", "noscript", "style", "textarea", "pre", "code"
+				]
+			};
+		</script>
+	<script src="https://unpkg.com/asciimath2tex@1.2.1/dist/asciimath2tex.umd.js"></script>
 	</head>
 	<body class="clearfix">
+	<p>This page extends the minimal markdown editor to include LaTeX maths (simple delimeters) and ASCIIMath.</p>
+	<p>\(x^2\), $x^3$, \[x^2\], $$x^3$$. </p>
 		<div id="left-column">
 			<div id="top_panels_container">
 				<div class="top_panel" id="quick-reference">
@@ -210,6 +248,7 @@ Just start typing in the left panel.
 		<div class="bottom-bar visible-when-fullscreen clearfix">
 			<div class="word-count"></div>
 		</div>
+<!--
 		<script type="text/javascript">
 		  var _gaq = _gaq || [];
 		  _gaq.push(['_setAccount', 'UA-8885785-17']);
@@ -220,5 +259,6 @@ Just start typing in the left panel.
 			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 		  })();
 		</script>
-	</body>
+ -->
+ 	</body>
 </html>
