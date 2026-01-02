@@ -29,16 +29,9 @@ window.markdownitMapLines = function(mdit) {
 		return "<hr />\n";
 	};
 
+	// This is four spaced indended.
 	mdit.renderer.rules.code_block = function(tokens, idx) {
-		const asciimathparser = new window.AsciiMathParser();
-		const latexwrap = (s) => `\\[${s}\\]`;
-
 		var code = tokens[idx].content;
-		const lines = code.split(/\r?\n/);
-		const processed = lines.map(line => latexwrap(asciimathparser.parse(line)));
-		return processed.join('\n');
-
-		// Original code, not needed.
 		if (tokens[idx].lines) {
 			return 	"<pre id=\"line-start-"+ tokens[idx].lines[0] +"\" data-line-end=\""+ tokens[idx].lines[1] +"\">"+
 						"<code>"+ escapeHtml(code) +"</code>"+
@@ -48,7 +41,20 @@ window.markdownitMapLines = function(mdit) {
 		return "<pre><code>"+ escapeHtml(code) +"</code></pre>\n";
 	};
 
-	mdit.renderer.rules.fence = mdit.renderer.rules.code_block;
+	// This is four backticks: ````....````.
+	mdit.renderer.rules.fence = function(tokens, idx) {
+		// Interpret each line as an ASCIIMath expression, and convert to LaTeX displayed equations.
+		const asciimathparser = new window.AsciiMathParser();
+		const latexwrap = (s) => `\\[${s}\\]`;
+
+		var code = tokens[idx].content;
+		// Split, trim, remove empty lines, parse, wrap, and join.
+		const processed = code.split(/\r?\n/)                 // Split by newlines.
+							.map(line => line.trim())         // Trim whitespace.
+							.filter(line => line !== "")      // Remove empty lines.
+							.map(line => latexwrap(asciimathparser.parse(line)));   // Apply parse and wrap.
+		return processed.join('\n');
+	};
 
 	mdit.renderer.rules.tr_open = function(tokens, idx) {
 		if (tokens[idx].lines) {

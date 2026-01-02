@@ -156,10 +156,11 @@ $document.ready(function() {
 
 			if (this.activePanel == "preview") {
 				// Pre-process with optional blocks. (Is this the right place?!)
-				// (1) Protect the latex backslashes before we render markdown.
 				protectedlatex = this.markdown;
+				// (1) Process AsciiMath.
+				protectedlatex = this.useASCCIMath(protectedlatex);
+				// (2) Protect the latex backslashes before we render markdown.
 				protectedlatex = protectedlatex.replace(/\\([()\[\]])/g, '\\\\$1');
-				// (2) Process AsciiMath.
 
 				html = this.previewMarkdownConverter.render(protectedlatex);
 				app.updateMarkdownPreview(html, isAfterUserInput);
@@ -333,6 +334,17 @@ $document.ready(function() {
 				// Rendering keys, e.g.:
 				throwOnError : false
 				});
+		},
+
+		// Pull out anything between `...` and process as ASCIIMath before converting markup.
+		// But not when we have ````....```` which is block code, of course.
+		useASCCIMath: function(str) {
+			const asciimathparser = new window.AsciiMathParser();
+			const latexwrap = (s) => `\\(${s}\\)`;
+			return str.replace(/(?<!`)`([^`]+)`(?!`)/g, (match, expr) => {
+				// Apply foo() to the content inside single backticks
+				return latexwrap(asciimathparser.parse(expr));
+  			});
 		},
 
 		toggleSyncScroll: (function() {
