@@ -203,27 +203,32 @@ Second line.</code></pre>
 						<a href="#" class="button icon-fullscreen feature" data-feature="fullscreen" data-tofocus="markdown" title="Go fullscreen"></a>
 					</div>
 				</div>
-				<textarea id="markdown" class="full-height" placeholder="Write Markdown"># Minimalist Online Markdown Editor
-
-This is the **simplest** and **slickest** online Markdown editor.  
-Just write Markdown and see what it looks like as you type. And convert it to HTML in one click.
-
-## Getting started
-
-### How?
+				<textarea id="markdown" class="full-height" placeholder="Write Markdown">## Getting started
 
 Just start typing in the left panel.
 
-### Buttons you might want to use
+### Mathematics
 
-- **Quick Reference**: that's a reminder of the most basic rules of Markdown
-- **HTML | Preview**: *HTML* to see the markup generated from your Markdown text, *Preview* to see how it looks like
+You can use backticks to include inline mathematics as [ASCIIMath](https://asciimath.org/), e.g. `sum_(k=1)^infty 1/k^2=pi^2/6`.  Displayed mathematics, and multiline mathematics is displayed with four backticks.  R.g.
+
+````
+prod_(k=0)^(n+1)(1+x^(2^k))=sum_(k=0)^(2^((n+1)+1)-1) x^k.
+
+````
+
+Matrix entry is very straightforward (use displayed maths):
+
+````
+[[2,1],[3,2]] [[2,-1],[-3,2]] =[[1,0],[0,1]]
+````
+
+You can include LaTeX mathematics using the normal delimiters, e.g. inline $x^2$, \(x^3\).  Displayed mathematics uses <code>\[...\]</code> or <code>$$...$$</code>.
 
 ### Privacy
 
 - No data is sent to any server – everything you type stays inside your browser
 - The editor automatically saves what you write locally for future use.  
-  If using a public computer, either empty the left panel before leaving the editor or use your browser's privacy mode</textarea>
+  If using a public computer, either empty the left panel before leaving the editor or use your browser's privacy mode.</textarea>
 			</div>
 		</div>
 		<div id="right-column">
