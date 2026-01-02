@@ -30,14 +30,22 @@ window.markdownitMapLines = function(mdit) {
 	};
 
 	mdit.renderer.rules.code_block = function(tokens, idx) {
+		const asciimathparser = new window.AsciiMathParser();
+		const latexwrap = (s) => `\\[${s}\\]`;
+
 		var code = tokens[idx].content;
+		const lines = code.split(/\r?\n/);
+		const processed = lines.map(line => latexwrap(asciimathparser.parse(line)));
+		return processed.join('\n');
+
+		// Original code, not needed.
 		if (tokens[idx].lines) {
 			return 	"<pre id=\"line-start-"+ tokens[idx].lines[0] +"\" data-line-end=\""+ tokens[idx].lines[1] +"\">"+
 						"<code>"+ escapeHtml(code) +"</code>"+
 					"</pre>\n";
 		}
 
-		return "HELLO!<pre><code>"+ escapeHtml(code) +"</code></pre>\n";
+		return "<pre><code>"+ escapeHtml(code) +"</code></pre>\n";
 	};
 
 	mdit.renderer.rules.fence = mdit.renderer.rules.code_block;

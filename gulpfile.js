@@ -7,6 +7,7 @@ var gulp = require("gulp"),
 	path = require("path"),
 	babel = require("gulp-babel"),
 	cssnext = require("gulp-cssnext")
+	asciimath2tex = require('./src/app-shared/js/asciimath2tex.js');
 
 	paths = {
 		base: {
