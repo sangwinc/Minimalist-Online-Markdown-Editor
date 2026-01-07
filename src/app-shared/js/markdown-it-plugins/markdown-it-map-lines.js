@@ -45,7 +45,6 @@ window.markdownitMapLines = function(mdit) {
 	mdit.renderer.rules.fence = function(tokens, idx) {
 		// Interpret each line as an ASCIIMath expression, and convert to LaTeX displayed equations.
 		const asciimathparser = new window.AsciiMathParser();
-		const latexwrap = (s) => `\\[${s}\\]`;
 
 		var code = tokens[idx].content;
 		// Split, trim, remove empty lines, parse, wrap, and join.
@@ -53,7 +52,18 @@ window.markdownitMapLines = function(mdit) {
 							.map(line => line.trim())         // Trim whitespace.
 							.filter(line => line !== "")      // Remove empty lines.
 							.map(line => latexwrap(asciimathparser.parse(line)));   // Apply parse and wrap.
-		return processed.join('\n');
+		return `\\[\\begin{align*}\n` + processed.join('\n') + `\n\\end{align*}\\]\n`;
+	};
+
+	function latexwrap(str) {
+		// Find first occurance of \text{ and bump that to the next column.}
+		const regex = /\\text\{(?!or\}|and\}|if\})/g;
+		const match = regex.exec(str);
+		console.log(match);
+		if (match) {
+			str = str.slice(0, match.index) + '&' + str.slice(match.index)
+		}
+		return ` & ` + str + `\\\\`;
 	};
 
 	mdit.renderer.rules.tr_open = function(tokens, idx) {
