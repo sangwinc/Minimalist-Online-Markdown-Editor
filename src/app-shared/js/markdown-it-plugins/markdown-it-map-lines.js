@@ -52,19 +52,67 @@ window.markdownitMapLines = function(mdit) {
 							.map(line => line.trim())         // Trim whitespace.
 							.filter(line => line !== "")      // Remove empty lines.
 							.map(line => latexwrap(asciimathparser.parse(line)));   // Apply parse and wrap.
+		//return processed.join('\n');
 		return `\\[\\begin{align*}\n` + processed.join('\n') + `\n\\end{align*}\\]\n`;
 	};
 
 	function latexwrap(str) {
 		// Find first occurance of \text{ and bump that to the next column.}
-		const regex = /\\text\{(?!or\}|and\}|if\})/g;
-		const match = regex.exec(str);
-		console.log(match);
-		if (match) {
-			str = str.slice(0, match.index) + '&' + str.slice(match.index)
+		const matchtxt = findtextindex(str, ['\\text{'], [`\\text{or}`, `\\text{and}`, `\\text{if}`]);
+		if (matchtxt) {
+			str = str.slice(0, matchtxt) + '& &' + str.slice(matchtxt)
 		}
-		return ` & ` + str + `\\\\`;
+		// Find first occurance of equals, inequality etc. and bump rest to the next column.}
+		const bracest = [`in`, `subset`, `subseteq`, `supset`, `supseteq`,
+						`leq`, `lt`, `le`, `geq`, `gt`,
+						`ne`, `approx`, `equiv`, `propto`, `cong`
+						];
+		const braces = [`=`].concat(bracest.flatMap(token => [`\\${token}{`, `\\${token} `]));
+		const matcheq = findtextindex(str, braces);
+		if (matcheq) {
+			str = str.slice(0, matcheq) + '&' + str.slice(matcheq);
+		} else {
+			str = str + `&`;
+		}
+		return str + `\\\\`;
 	};
+
+	function findtextindex(str, needle, without = []) {
+		let braceDepth = 0;
+
+		for (let i = 0; i < str.length; i++) {
+		const ch = str[i];
+		// Track brace nesting
+		if (ch === '{' || ch === '(' || ch === '[') {
+			braceDepth++;
+			continue;
+		}
+		if (ch === '}' || ch === ')' || ch === ']') {
+			braceDepth = Math.max(0, braceDepth - 1);
+			continue;
+		}
+
+		// Only consider "needle", e.g. \text at top level.
+		if (braceDepth === 0) {
+			// Starts with one of the needles?
+			const isIncluded = needle.some(
+				token => str.startsWith(token, i)
+			);
+			if (!isIncluded) {
+				continue;
+			}
+			// Check against excluded tokens
+			const isExcluded = without.some(
+				token => str.startsWith(token, i)
+			);
+			if (!isExcluded) {
+				return i;
+			}
+		}
+	}
+
+	return false;
+	}
 
 	mdit.renderer.rules.tr_open = function(tokens, idx) {
 		if (tokens[idx].lines) {
