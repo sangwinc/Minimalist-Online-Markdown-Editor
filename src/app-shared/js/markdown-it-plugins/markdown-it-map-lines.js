@@ -52,7 +52,6 @@ window.markdownitMapLines = function(mdit) {
 							.map(line => line.trim())         // Trim whitespace.
 							.filter(line => line !== "")      // Remove empty lines.
 							.map(line => latexwrap(asciimathparser.parse(line)));   // Apply parse and wrap.
-		//return processed.join('\n');
 		return `\\[\\begin{align*}\n` + processed.join('\n') + `\n\\end{align*}\\]\n`;
 	};
 
@@ -63,9 +62,10 @@ window.markdownitMapLines = function(mdit) {
 			str = str.slice(0, matchtxt) + '& &' + str.slice(matchtxt)
 		}
 		// Find first occurance of equals, inequality etc. and bump rest to the next column.}
-		const bracest = [`in`, `subset`, `subseteq`, `supset`, `supseteq`,
+		const bracest = [`in`, `notin`, `subset`, `subseteq`, `supset`, `supseteq`,
 						`leq`, `lt`, `le`, `geq`, `gt`,
-						`ne`, `approx`, `equiv`, `propto`, `cong`
+						`preq`, `preqeq`, `succ`, `succeq`,
+						`ne`, `neq`, `approx`, `equiv`, `propto`, `cong`,
 						];
 		const braces = [`=`].concat(bracest.flatMap(token => [`\\${token}{`, `\\${token} `]));
 		const matcheq = findtextindex(str, braces);
@@ -77,40 +77,48 @@ window.markdownitMapLines = function(mdit) {
 		return str + `\\\\`;
 	};
 
+	// Finds the first occurance of something in needle, which is _outside_ any braces, unless it's in without.
 	function findtextindex(str, needle, without = []) {
 		let braceDepth = 0;
 
 		for (let i = 0; i < str.length; i++) {
-		const ch = str[i];
-		// Track brace nesting
-		if (ch === '{' || ch === '(' || ch === '[') {
-			braceDepth++;
+			const ch = str[i];
+			// Track brace nesting.
+			if (ch === '{' || ch === '(' || ch === '[') {
+				braceDepth++;
 			continue;
-		}
-		if (ch === '}' || ch === ')' || ch === ']') {
-			braceDepth = Math.max(0, braceDepth - 1);
-			continue;
-		}
-
-		// Only consider "needle", e.g. \text at top level.
-		if (braceDepth === 0) {
-			// Starts with one of the needles?
-			const isIncluded = needle.some(
-				token => str.startsWith(token, i)
-			);
-			if (!isIncluded) {
+			}
+			if (str.startsWith('\\lbrace', i)) {
+				braceDepth++;
 				continue;
 			}
-			// Check against excluded tokens
-			const isExcluded = without.some(
-				token => str.startsWith(token, i)
-			);
-			if (!isExcluded) {
-				return i;
+			if (ch === '}' || ch === ')' || ch === ']') {
+				braceDepth = Math.max(0, braceDepth - 1);
+				continue;
+			}
+			if (str.startsWith('\\rbrace', i)) {
+				braceDepth = Math.max(0, braceDepth - 1);
+				continue;
+			}
+
+			// Only consider "needle", e.g. \text at top level.
+			if (braceDepth === 0) {
+				// Starts with one of the needles?
+				const isIncluded = needle.some(
+					token => str.startsWith(token, i)
+				);
+				if (!isIncluded) {
+					continue;
+				}
+				// Check against excluded tokens.
+				const isExcluded = without.some(
+					token => str.startsWith(token, i)
+				);
+				if (!isExcluded) {
+					return i;
+				}
 			}
 		}
-	}
-
 	return false;
 	}
 
