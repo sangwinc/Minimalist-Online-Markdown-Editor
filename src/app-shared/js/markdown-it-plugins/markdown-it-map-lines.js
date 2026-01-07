@@ -69,7 +69,8 @@ window.markdownitMapLines = function(mdit) {
 						];
 		const braces = [`=`].concat(bracest.flatMap(token => [`\\${token}{`, `\\${token} `]));
 		const matcheq = findtextindex(str, braces);
-		if (matcheq) {
+		// Zero vs false issue.
+		if (matcheq !== false) {
 			str = str.slice(0, matcheq) + '&' + str.slice(matcheq);
 		} else {
 			str = str + `&`;
