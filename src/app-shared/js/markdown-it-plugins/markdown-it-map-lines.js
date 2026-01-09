@@ -55,13 +55,17 @@ window.markdownitMapLines = function(mdit) {
 		return `\\[\\begin{align*}\n` + processed.join('\n') + `\n\\end{align*}\\]\n`;
 	};
 
+    // The goal of this function is to take the LaTeX string of a line in align* environment and split it up.
+    // 1. If we _start_ with an implies, therefore, etc.  then we have this in column to the left.
+    // 2. If we have an =, <= etc. which is _outside any kind of bracket_ then we align on this.
+    // 3. The first \text{} (which is not a special \text{or} etc) should be a separate column to the right.
 	function latexwrap(str) {
-		// Find first occurance of \text{ and bump that to the next column.}
+		// 3. Find first occurance of \text{ and bump that to the next column.}
 		const matchtxt = findtextindex(str, ['\\text{'], [`\\text{or}`, `\\text{and}`, `\\text{if}`]);
 		if (matchtxt) {
 			str = str.slice(0, matchtxt) + '& &' + str.slice(matchtxt)
 		}
-		// Find first occurance of equals, inequality etc. and bump rest to the next column.}
+		// 2. Find first occurance of equals, inequality etc. and bump rest to the next column.}
 		const bracest = [`in`, `notin`, `subset`, `subseteq`, `supset`, `supseteq`,
 						`leq`, `lt`, `le`, `geq`, `gt`,
 						`preq`, `preqeq`, `succ`, `succeq`,
@@ -74,6 +78,15 @@ window.markdownitMapLines = function(mdit) {
 			str = str.slice(0, matcheq) + '&' + str.slice(matcheq);
 		} else {
 			str = str + `&`;
+		}
+		// 1. If we _start_ with an implies, therefore, etc.
+		const imptxt = ['Rightarrow', `Leftarrow`, `Leftrightarrow`, `therefore`, `because`];
+		const imptxttk = imptxt.flatMap(token => [`\\${token}{`, `\\${token} `]);
+		const matchimp = imptxttk.find(token => str.startsWith(token));
+		if (matchimp === undefined) {
+			str = `& & ` + str;
+		} else {
+			str = str.slice(0, matchimp.length) + '& &' + str.slice(matchimp.length);
 		}
 		return str + `\\\\`;
 	};
