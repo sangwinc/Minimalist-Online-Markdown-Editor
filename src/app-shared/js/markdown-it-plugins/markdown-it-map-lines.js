@@ -67,11 +67,11 @@ window.markdownitMapLines = function(mdit) {
 		}
 		// 2. Find first occurance of equals, inequality etc. and bump rest to the next column.}
 		const bracest = [`in`, `notin`, `subset`, `subseteq`, `supset`, `supseteq`,
-						`leq`, `lt`, `le`, `geq`, `gt`,
+						`leq`, `lt`, `le`, `geq`, `gt`, `ge`,
 						`preq`, `preqeq`, `succ`, `succeq`,
 						`ne`, `neq`, `approx`, `equiv`, `propto`, `cong`,
 						];
-		const braces = [`=`].concat(bracest.flatMap(token => [`\\${token}{`, `\\${token} `]));
+		const braces = [`=`, `>`, '<'].concat(bracest.flatMap(token => [`\\${token}{`, `\\${token} `]));
 		const matcheq = findtextindex(str, braces);
 		// Zero vs false issue.
 		if (matcheq !== false) {
